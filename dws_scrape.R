@@ -1,6 +1,8 @@
-# Download and analyze the river flow data.
-# Beitbridge A7H004 start: 1955-06-27 end: 1992-07-15
-# Beitbridge A7H008 start: 1992-07-28 end: 2022-01-27
+# Download and analyze the river flow data from Department of Water and Sanitation, South Africa.
+# https://www.dws.gov.za/Hydrology/Verified/hymain.aspx
+# G1H020
+# G1H008
+# G1H013
 
 library(readr)
 library(ggplot2)
@@ -17,12 +19,12 @@ registerDoParallel(detectCores())
 # Example: https://www.dws.gov.za/Hydrology/Verified/HyData.aspx?Station=A7H008100.00&DataType=Point&StartDT=2021-01-01&EndDT=2022-01-27&SiteType=RIV
 # Waiting on quality code key (2022 Apr 04)
 base <- "https://www.dws.gov.za/Hydrology/Verified/HyData.aspx?Station="
-station <- "A7H004"
+station <- "G1H020"
 variable <- "100.00"
 stem1 <- "&DataType=Point&StartDT="
 start <- "1955-06-27"
 stem2 <- "&EndDT="
-end <- "1992-07-15"
+end <- "2022-10-01"
 tail <- "&SiteType=RIV"
 terminate <- force_tz(as_datetime(ymd(end)), tzone = "Africa/Johannesburg")
 
