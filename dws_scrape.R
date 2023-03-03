@@ -19,7 +19,7 @@ registerDoParallel(detectCores())
 # Example: https://www.dws.gov.za/Hydrology/Verified/HyData.aspx?Station=A7H008100.00&DataType=Point&StartDT=2021-01-01&EndDT=2022-01-27&SiteType=RIV
 # Waiting on quality code key (2022 Apr 04)
 base <- "https://www.dws.gov.za/Hydrology/Verified/HyData.aspx?Station="
-station <- "G1H020"
+station <- "G1H013"
 variable <- "100.00"
 stem1 <- "&DataType=Point&StartDT="
 start <- "1955-06-27"
