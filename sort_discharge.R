@@ -29,14 +29,35 @@ ggplot(month_trend) +
      theme(aspect.ratio = 1) +
      theme(axis.text = element_text(face = "plain", size = 12))
 
-monthly <- x %>%
-     mutate(mon=month(with_tz(as_datetime(X2), tzone = "Africa/Johannesburg")),
-            yea=year(with_tz(as_datetime(X2), tzone = "Africa/Johannesburg")),
-            yearmo=100*yea+mon) %>%
+y <- array(NA, dim = c(nrow(x),ncol(x)+2))
+j <- 1
+for (i in 1:nrow(x)) {
+     if (is.na(x$X2[i])==FALSE) {
+          y[j,1] <- x$X1[i]
+          y[j,2] <- x$X2[i]
+          y[j,3] <- x$X3[i]
+          y[j,4] <- x$X4[i]
+          y[j,5] <- x$X5[i]
+          y[j,6] <- x$X6[i]
+          y[j,7] <- hyd.mo(with_tz(as_datetime(x$X2[i]), tzone = "Africa/Johannesburg"), h="S")
+          y[j,8] <- hyd.yr(with_tz(as_datetime(x$X2[i]), tzone = "Africa/Johannesburg"), h="S")
+          j <- j + 1
+     }
+}
+y <- y[1:(j-1),1:8]
+y <- data.frame(y)
+
+monthly <- y %>%
+     rename(height=X3,discharge=X5,mon=X7,yea=X8) %>%
+     mutate(yearmo=100*yea+mon) %>%
      group_by(yearmo) %>%
-     summarize(monthAverage=mean(discharge, na.rm = TRUE),monthSTD=sd(discharge, na.rm = TRUE))
+     summarize(monthAverage=mean(discharge, na.rm = TRUE),monthSTD=sd(discharge, na.rm = TRUE)) %>%
+     mutate(yea=floor(yearmo/100),mon=yearmo-100*floor(yearmo/100)) %>%
+     mutate(decYear=yea+(mon-0.5)/12) %>%
+     mutate(dt=ymd(paste0(yea,"-",mon,"-","15")))
 
-
+m$label <- c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
+m$label <- factor(m$label, levels = c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"))
 
 
 
