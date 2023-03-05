@@ -20,6 +20,9 @@ month_trend <- x %>%
      summarize(monthAverage=mean(discharge, na.rm = TRUE),monthSTD=sd(discharge, na.rm = TRUE)) %>%
      filter(is.na(mon)==FALSE)
 
+m$label <- c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
+m$label <- factor(m$label, levels = c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"))
+
 ggplot(month_trend) +
      geom_col(aes(x=factor(mon),y=monthAverage)) +
      #geom_errorbar(aes(x=mon,ymin=monthAverage-monthSTD,ymax=monthAverage+monthSTD), width = 0.3) + # Standard deviation is very large
@@ -55,13 +58,6 @@ monthly <- y %>%
      mutate(yea=floor(yearmo/100),mon=yearmo-100*floor(yearmo/100)) %>%
      mutate(decYear=yea+(mon-0.5)/12) %>%
      mutate(dt=ymd(paste0(yea,"-",mon,"-","15")))
-
-m$label <- c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
-m$label <- factor(m$label, levels = c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"))
-
-
-
-
 
 
 
