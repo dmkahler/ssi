@@ -32,3 +32,8 @@ for (i in 1:nrow(x)) {
      NyearTotal[i,1] <- x$end[i]
      NyearTotal[i,2] <- x$Total[i]
 }
+
+z <- data.frame(yea,mon,y)
+
+
+
