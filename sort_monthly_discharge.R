@@ -58,4 +58,12 @@ ggplot(DWSmonth) +
      theme(aspect.ratio = 0.5) +
      theme(axis.text = element_text(face = "plain", size = 12))
 
+annum <- data.frame(NyearTotal)
+annum <- rename(annum,year=X1,volume=X2) # here, volume is in million cubic meters, year is OCTOBER hydrologic year
+ggplot(annum) +
+     geom_line(aes(x=year,y=volume))
+
+
+
+
 
