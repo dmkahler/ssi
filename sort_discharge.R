@@ -19,12 +19,11 @@ month_trend <- x %>%
      group_by(mon) %>%
      summarize(monthAverage=mean(discharge, na.rm = TRUE),monthSTD=sd(discharge, na.rm = TRUE)) %>%
      filter(is.na(mon)==FALSE)
-
-m$label <- c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
-m$label <- factor(m$label, levels = c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"))
+month_trend$label <- c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
+month_trend$label <- factor(month_trend$label, levels = c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"))
 
 ggplot(month_trend) +
-     geom_col(aes(x=factor(mon),y=monthAverage)) +
+     geom_col(aes(x=label,y=monthAverage)) +
      #geom_errorbar(aes(x=mon,ymin=monthAverage-monthSTD,ymax=monthAverage+monthSTD), width = 0.3) + # Standard deviation is very large
      xlab("Month") +
      ylab(TeX('Mean Discharge $(m^3/s)$')) +
