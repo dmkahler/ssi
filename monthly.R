@@ -42,7 +42,7 @@ for (i in 1:nrow(x)) {
 }
 
 z <- data.frame(yea,mon,y,start,end)
-monthly <- z %>%
+DWSmonth <- z %>%
      mutate(dt=ymd(paste0(yea,"-",mon,"-","15"))) %>%
      rename(year=yea,month=mon) %>%
      mutate(volume=y*1e6) %>%
@@ -51,7 +51,6 @@ monthly <- z %>%
      select(year,month,dt,volume,Q)
 
 # Compare
-# DWSmonth <- monthly
 # DWSraw <- monthly
 y1 <- min(c(min(DWSmonth$year),min(DWSraw$yea)))
 y2 <- max(c(max(DWSmonth$year),max(DWSraw$yea)))
@@ -91,7 +90,15 @@ monDat3 <- monDat2 %>%
      mutate(dt=ymd(paste0(year,"-",month,"-","15"))) %>%
      pivot_longer(cols = c(Monthly,Raw),names_to = "Source",values_to = "Discharge")
 ggplot(monDat3) +
-     geom_line(aes(x=dt,y=Discharge,color=Source))
+     geom_line(aes(x=dt,y=Discharge,color=Source)) +
+     labs(title="Time series comparison of monthly average discharge at G1H202",
+          x="Date",
+          y=TeX('Discharge $(m^3/s)$ from monthly data')) +
+     theme(panel.background = element_rect(fill = "white", colour = "black")) +
+     theme(legend.position = "right") +
+     theme(legend.background = element_rect(fill = "white", colour = "black")) +
+     theme(legend.key = element_rect(fill = "white")) +
+     theme(axis.text = element_text(face = "plain", size = 12))
 
 
 
