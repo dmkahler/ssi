@@ -50,7 +50,7 @@ for (i in 1:nrow(x)) {
 y <- y[1:(j-1),1:8]
 y <- data.frame(y)
 
-monthly <- y %>%
+DWSraw <- y %>%
      rename(height=X3,discharge=X5,mon=X7,yea=X8) %>%
      mutate(yearmo=100*yea+mon) %>%
      group_by(yearmo) %>%
