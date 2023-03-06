@@ -1,4 +1,4 @@
-# Sort data
+# Sort data from RAW data pull
 library(readr)
 library(ggplot2)
 library(dplyr)
