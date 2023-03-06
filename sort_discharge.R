@@ -36,8 +36,8 @@ y <- array(NA, dim = c(nrow(x),ncol(x)+2))
 j <- 1
 for (i in 1:nrow(x)) {
      if (is.na(x$X2[i])==FALSE) {
-          y[j,1] <- x$X1[i]
-          y[j,2] <- x$X2[i]
+          y[j,1] <- x$X1[i] # in SAST, but says UTC
+          y[j,2] <- x$X2[i] # UTC
           y[j,3] <- x$X3[i]
           y[j,4] <- x$X4[i]
           y[j,5] <- x$X5[i]
@@ -50,9 +50,14 @@ for (i in 1:nrow(x)) {
 y <- y[1:(j-1),1:8]
 y <- data.frame(y)
 
-DWSraw <- y %>%
-     rename(height=X3,discharge=X5,mon=X7,yea=X8) %>%
-     mutate(yearmo=100*yea+mon) %>%
+z <- y %>%
+     mutate(month=month(with_tz(as_datetime(X2), tzone = "Africa/Johannesburg"))) %>%
+     mutate(year=year(with_tz(as_datetime(X2), tzone = "Africa/Johannesburg"))) %>%
+     rename(dt=X2,height=X3,discharge=X5,hydroMonth=X7,hydroYear=X8) %>%
+     select(dt,year,month,height,hydroYear,hydroMonth,height,discharge)
+
+DWSraw <- z %>%
+     mutate(yearmo=100*year+month) %>%
      group_by(yearmo) %>%
      summarize(monthAverage=mean(discharge, na.rm = TRUE),monthSTD=sd(discharge, na.rm = TRUE)) %>%
      mutate(yea=floor(yearmo/100),mon=yearmo-100*floor(yearmo/100)) %>%
