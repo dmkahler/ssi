@@ -7,7 +7,7 @@ library(stringr)
 library(tidyr)
 library(latex2exp)
 library(devtools)
-install_github("LimpopoLab/hydrostats", force = TRUE)
+install_github("LimpopoLab/hydrostats")
 library(hydrostats)
 
 x <- read_csv("G1H020.csv", col_names = FALSE)
