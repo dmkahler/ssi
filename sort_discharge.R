@@ -12,6 +12,17 @@ library(hydrostats)
 
 x <- read_csv("G1H020.csv", col_names = FALSE)
 
+r <- x %>%
+     rename(dt=X1,unix=X2,height=X3,discharge=X5) %>%
+     select(dt,unix,height,discharge)
+ggplot(r) +
+     geom_line(aes(x=dt,y=discharge)) +
+     xlab("Date (raw data, ~ 8 samples/day)") +
+     ylab(TeX('Mean Discharge $(m^3/s)$')) +
+     theme(panel.background = element_rect(fill = "white", colour = "black")) + 
+     theme(aspect.ratio = 0.5) +
+     theme(axis.text = element_text(face = "plain", size = 12))
+
 month_trend <- x %>%
      mutate(mon=month(with_tz(as_datetime(X2), tzone = "Africa/Johannesburg"))) %>%
      rename(dt=X1,unix=X2,height=X3,discharge=X5) %>%
