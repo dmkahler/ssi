@@ -1,5 +1,6 @@
 # pull the DWS monthly data
 # table starts with October
+# DWS data source: https://www.dws.gov.za/Hydrology/Verified/hymain.aspx
 
 library(readr)
 library(ggplot2)
@@ -12,13 +13,18 @@ library(devtools)
 install_github("LimpopoLab/hydrostats", force = TRUE)
 library(hydrostats)
 
-x <- read_csv("G1H020_monthly.csv")
-y <- array(NA, dim = (12*nrow(x)))
-yea <- y
-mon <- y
-start <- y
-end <- y
-NyearTotal <- array(NA, dim = c(nrow(x),2))
+x <- read_csv("G1H020_monthly.csv") # read in data from the monthly download from DWS
+
+# PREALLOCATION
+y <- array(NA, dim = (12*nrow(x))) # preallocate list for data
+yea <- y # year
+mon <- y # month
+start <- y # the start year
+end <- y # the end year, of the hydrologic year
+NyearTotal <- array(NA, dim = c(nrow(x),2)) # list for the annual total
+
+# SORT
+# and 
 for (i in 1:nrow(x)) {
      for (j in 1:12){
           pos <- j+(i-1)*12
