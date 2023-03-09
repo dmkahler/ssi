@@ -1,4 +1,5 @@
 # pull the DWS monthly data
+# compare with the averaged raw data from sort_discharge.R
 # table starts with October
 
 library(readr)
