@@ -12,6 +12,7 @@ library(latex2exp)
 library(devtools)
 install_github("LimpopoLab/hydrostats", force = TRUE)
 library(hydrostats)
+library(SPEI) # from Mxolisi & Ndumiso, https://cran.r-project.org/web/packages/SPEI/index.html
 
 x <- read_csv("G1H020_monthly.csv")
 y <- array(NA, dim = (12*nrow(x)))
@@ -92,7 +93,7 @@ monDat3 <- monDat2 %>%
      pivot_longer(cols = c(Monthly,Raw),names_to = "Source",values_to = "Discharge")
 ggplot(monDat3) +
      geom_line(aes(x=dt,y=Discharge,color=Source)) +
-     labs(title="Time series comparison of monthly average discharge at G1H202",
+     labs(title="Time series comparison of monthly average discharge at G1H020",
           x="Date",
           y=TeX('Discharge $(m^3/s)$ from monthly data')) +
      theme(panel.background = element_rect(fill = "white", colour = "black")) +
