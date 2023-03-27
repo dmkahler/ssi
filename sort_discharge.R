@@ -10,7 +10,7 @@ library(devtools)
 install_github("LimpopoLab/hydrostats")
 library(hydrostats)
 
-x <- read_csv("G1H020.csv", col_names = FALSE)
+x <- read_csv("G1H020scrape.csv", col_names = FALSE)
 
 r <- x %>%
      rename(dt=X1,unix=X2,height=X3,discharge=X5) %>%

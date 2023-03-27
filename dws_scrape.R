@@ -127,7 +127,7 @@ for (i in 1:100) {
                select(-X1,-X2,-X3,-X4,-X5)
           # Headers: Date, UNIX date, Level (m), Level QC, Flow (m^3/s), Flow QC
           
-          write_csv(y, paste0(station,".csv"), append = TRUE)
+          write_csv(y, paste0(station,"scrape.csv"), append = TRUE)
           
           ## Check to see if we're importing the same day
           if ((is.na(ymd(next_start))==FALSE)&(is.na(ymd(start))==FALSE)) {
