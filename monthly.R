@@ -54,6 +54,7 @@ DWSmonth <- z %>%
 
 # Compare
 # DWSraw <- monthly
+#################### RUN sort_discharge.R to populate DWSraw #############################
 y1 <- min(c(min(DWSmonth$year),min(DWSraw$yea)))
 y2 <- max(c(max(DWSmonth$year),max(DWSraw$yea)))
 monDat <- array(NA, dim = c((y2-y1+1),12))
