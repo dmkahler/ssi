@@ -14,6 +14,7 @@ install_github("LimpopoLab/hydrostats", force = TRUE)
 library(hydrostats)
 
 x <- read_csv("G1H020_monthly.csv") # read in data from the monthly download from DWS
+# Data from: https://www.dws.gov.za/Hydrology/Verified/HyDataSets.aspx?Station=G1H020&SiteDesc=RIV
 
 # PREALLOCATION
 y <- array(NA, dim = (12*nrow(x))) # preallocate list for data
