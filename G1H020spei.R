@@ -5,6 +5,8 @@ library(lubridate)
 library(SPEI)
 library(writexl)
 
+x <- read_csv("G1H020dws.csv")
+
 G1H020 <- G1H020[1:667,]
 
 G1H020.1 <- separate(G1H020, "date", c('day', "month", 'year'))
