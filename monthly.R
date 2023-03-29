@@ -1,5 +1,5 @@
 # pull the DWS monthly data
-# compare with the averaged raw data from sort_discharge.R
+# compare with the averaged raw data from sort_discharge.R the DWS internal data pull
 # table starts with October
 
 library(readr)
@@ -13,6 +13,9 @@ library(devtools)
 install_github("LimpopoLab/hydrostats", force = TRUE)
 library(hydrostats)
 library(SPEI) # from Mxolisi & Ndumiso, https://cran.r-project.org/web/packages/SPEI/index.html
+
+##################################### Monthly data from DWS website
+# Data from: https://www.dws.gov.za/Hydrology/Verified/HyDataSets.aspx?Station=G1H020&SiteDesc=RIV
 
 x <- read_csv("G1H020_monthly.csv")
 y <- array(NA, dim = (12*nrow(x)))
@@ -51,10 +54,45 @@ DWSmonth <- z %>%
      mutate(days=end-start) %>%
      mutate(Q=volume/(days*24*3600)) %>% # this will be average m^3/s
      select(year,month,dt,volume,Q)
+rm(x,y,z,NyearTotal,end,mon,pos,start,yea)
 
-# Compare
-# DWSraw <- monthly
-#################### RUN sort_discharge.R to populate DWSraw #############################
+##################################### Averaged monthly data from "primary data" on DWS website
+# Data from: https://www.dws.gov.za/Hydrology/Verified/HyDataSets.aspx?Station=G1H020&SiteDesc=RIV
+
+x <- read_csv("G1H020scrape.csv", col_names = FALSE)
+y <- array(NA, dim = c(nrow(x),ncol(x)+2))
+j <- 1
+for (i in 1:nrow(x)) {
+     if (is.na(x$X2[i])==FALSE) {
+          y[j,1] <- x$X1[i] # in SAST, but says UTC
+          y[j,2] <- x$X2[i] # UTC
+          y[j,3] <- x$X3[i]
+          y[j,4] <- x$X4[i]
+          y[j,5] <- x$X5[i]
+          y[j,6] <- x$X6[i]
+          y[j,7] <- hyd.mo(with_tz(as_datetime(x$X2[i]), tzone = "Africa/Johannesburg"), h="S")
+          y[j,8] <- hyd.yr(with_tz(as_datetime(x$X2[i]), tzone = "Africa/Johannesburg"), h="S")
+          j <- j + 1
+     }
+}
+y <- y[1:(j-1),1:8]
+y <- data.frame(y)
+
+z <- y %>%
+     mutate(month=month(with_tz(as_datetime(X2), tzone = "Africa/Johannesburg"))) %>%
+     mutate(year=year(with_tz(as_datetime(X2), tzone = "Africa/Johannesburg"))) %>%
+     rename(dt=X2,height=X3,discharge=X5,hydroMonth=X7,hydroYear=X8) %>%
+     select(dt,year,month,height,hydroYear,hydroMonth,height,discharge)
+
+DWSraw <- z %>%
+     mutate(yearmo=100*year+month) %>%
+     group_by(yearmo) %>%
+     summarize(monthAverage=mean(discharge, na.rm = TRUE),monthSTD=sd(discharge, na.rm = TRUE)) %>%
+     mutate(yea=floor(yearmo/100),mon=yearmo-100*floor(yearmo/100)) %>%
+     mutate(decYear=yea+(mon-0.5)/12) %>%
+     mutate(dt=ymd(paste0(yea,"-",mon,"-","15")))
+
+# building comparison data frames.
 y1 <- min(c(min(DWSmonth$year),min(DWSraw$yea)))
 y2 <- max(c(max(DWSmonth$year),max(DWSraw$yea)))
 monDat <- array(NA, dim = c((y2-y1+1),12))
