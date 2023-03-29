@@ -70,8 +70,8 @@ for (i in 1:nrow(x)) {
           y[j,4] <- x$X4[i]
           y[j,5] <- x$X5[i]
           y[j,6] <- x$X6[i]
-          y[j,7] <- hyd.mo(with_tz(as_datetime(x$X2[i]), tzone = "Africa/Johannesburg"), h="S")
-          y[j,8] <- hyd.yr(with_tz(as_datetime(x$X2[i]), tzone = "Africa/Johannesburg"), h="S")
+          y[j,7] <- hyd.mo(with_tz(as_datetime(x$X2[i]), tzone = "Africa/Johannesburg"), "S")
+          y[j,8] <- hyd.yr(with_tz(as_datetime(x$X2[i]), tzone = "Africa/Johannesburg"), "S")
           j <- j + 1
      }
 }
