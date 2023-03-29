@@ -17,7 +17,7 @@ library(SPEI) # from Mxolisi & Ndumiso, https://cran.r-project.org/web/packages/
 ##################################### Monthly data from DWS website
 # Data from: https://www.dws.gov.za/Hydrology/Verified/HyDataSets.aspx?Station=G1H020&SiteDesc=RIV
 
-x <- read_csv("G1H020_monthly.csv")
+x <- read_csv("G1H020monthly.csv")
 y <- array(NA, dim = (12*nrow(x)))
 yea <- y
 mon <- y
