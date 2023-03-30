@@ -104,7 +104,7 @@ rm(x,y,z)
 x <- read_csv("G1H020dws.csv")
 
 DWSint <- x %>%
-     mutate(dn=dmy_hm(date)) %>%
+     mutate(dn=dmy_hm(date)-1) %>%m # tried with and without -1, no improvement.
      mutate(y=year(dn),m=month(dn)) %>%
      mutate(yearmo=100*y+m) %>%
      group_by(yearmo) %>%
