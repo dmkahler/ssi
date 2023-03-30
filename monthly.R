@@ -53,7 +53,8 @@ DWSmonth <- z %>%
      mutate(volume=y*1e6) %>%
      mutate(days=end-start) %>%
      mutate(Q=volume/(days*24*3600)) %>% # this will be average m^3/s
-     select(year,month,dt,volume,Q)
+     select(year,month,dt,Q) %>%
+     mutate(measurement="monthly")
 rm(x,y,z,NyearTotal,end,mon,pos,start,yea)
 
 ##################################### Averaged monthly data from "primary data" on DWS website
@@ -88,58 +89,81 @@ DWSraw <- z %>%
      mutate(yearmo=100*year+month) %>%
      group_by(yearmo) %>%
      summarize(monthAverage=mean(discharge, na.rm = TRUE),monthSTD=sd(discharge, na.rm = TRUE)) %>%
-     mutate(yea=floor(yearmo/100),mon=yearmo-100*floor(yearmo/100)) %>%
-     mutate(decYear=yea+(mon-0.5)/12) %>%
-     mutate(dt=ymd(paste0(yea,"-",mon,"-","15")))
+     mutate(year=floor(yearmo/100),mon=yearmo-100*floor(yearmo/100)) %>%
+     mutate(month=yearmo-100*year) %>%
+     #mutate(decYear=yea+(mon-0.5)/12) %>%
+     mutate(dt=ymd(paste0(year,"-",month,"-","15"))) %>%
+     rename(Q=monthAverage) %>%
+     select(year,month,dt,Q) %>%
+     mutate(measurement="primary")
+rm(x,y,z)
 
-# building comparison data frames.
-y1 <- min(c(min(DWSmonth$year),min(DWSraw$yea)))
-y2 <- max(c(max(DWSmonth$year),max(DWSraw$yea)))
-monDat <- array(NA, dim = c((y2-y1+1),12))
-rawDat <- monDat
+##################################### Monthly data from internal DWS server
+# 
 
-for (i in 1:nrow(DWSmonth)) {
-     monDat[(DWSmonth$year[i]-y1+1),DWSmonth$month[i]] <- DWSmonth$Q[i]
-}
-monDat <- data.frame(monDat)
-monDat$year <- c(y1:y2)
-monDat2 <- monDat %>%
-     rename(Jan=X1,Feb=X2,Mar=X3,Apr=X4,May=X5,Jun=X6,Jul=X7,Aug=X8,Sep=X9,Oct=X10,Nov=X11,Dec=X12) %>%
-     pivot_longer(cols = c(Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec),names_to = "month",values_to = "Monthly")
-for (i in 1:nrow(DWSraw)) {
-     rawDat[(DWSraw$yea[i]-y1+1),DWSraw$mon[i]] <- DWSraw$monthAverage[i]
-}
-rawDat <- data.frame(rawDat)
-rawDat$year <- c(y1:y2)
-rawDat2 <- rawDat %>%
-     rename(Jan=X1,Feb=X2,Mar=X3,Apr=X4,May=X5,Jun=X6,Jul=X7,Aug=X8,Sep=X9,Oct=X10,Nov=X11,Dec=X12) %>%
-     pivot_longer(cols = c(Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec),names_to = "month",values_to = "Raw")
-monDat2$Raw <- rawDat2$Raw
+x <- read_csv("G1H020dws.csv")
 
-ggplot(monDat2) +
-     geom_point(aes(x=Raw,y=Monthly)) +
-     labs(title="Comparison of monthly average discharge at G1H020", 
-          x=TeX('Discharge $(m^3/s)$ from raw data'), 
-          y=TeX('Discharge $(m^3/s)$ from monthly data')) +
-     xlim(c(0,150)) +
-     ylim(c(0,150)) +
+DWSint <- x %>%
+     mutate(dn=dmy_hm(date)) %>%
+     mutate(y=year(dn),m=month(dn)) %>%
+     mutate(yearmo=100*y+m) %>%
+     group_by(yearmo) %>%
+     summarize(Q=mean(`Discharge(cumecs)`)) %>%
+     mutate(year=floor(yearmo/100),mon=yearmo-100*floor(yearmo/100)) %>%
+     mutate(month=yearmo-100*year) %>%
+     mutate(dt=ymd(paste0(year,"-",month,"-","15"))) %>%
+     select(year,month,dt,Q) %>%
+     mutate(measurement="internal")
+rm(x)
+
+
+long <- rbind(DWSraw,DWSmonth,DWSint)
+long <- rename(long, Source=measurement)
+ts <- ggplot(long) +
+     geom_line(aes(x=dt,y=Q,color=Source)) +
+     xlab("Date (monthly)") +
+     ylab(TeX('Mean Discharge $(m^3/s)$')) +
      theme(panel.background = element_rect(fill = "white", colour = "black")) + 
      theme(aspect.ratio = 1) +
-     theme(axis.text = element_text(face = "plain", size = 12))
+     theme(axis.text = element_text(face = "plain", size = 14)) +
+     theme(axis.title = element_text(face = "plain", size = 14)) +
+     theme(legend.key = element_blank()) +
+     theme(legend.background = element_rect(fill = "white", colour = "black"))
+ggsave("timeseries.eps", ts, device = "eps", dpi = 300)
 
-monDat3 <- monDat2 %>%
-     mutate(dt=ymd(paste0(year,"-",month,"-","15"))) %>%
-     pivot_longer(cols = c(Monthly,Raw),names_to = "Source",values_to = "Discharge")
-ggplot(monDat3) +
-     geom_line(aes(x=dt,y=Discharge,color=Source)) +
-     labs(title="Time series comparison of monthly average discharge at G1H020",
-          x="Date",
-          y=TeX('Discharge $(m^3/s)$ from monthly data')) +
-     theme(panel.background = element_rect(fill = "white", colour = "black")) +
-     theme(legend.position = "right") +
-     theme(legend.background = element_rect(fill = "white", colour = "black")) +
-     theme(legend.key = element_rect(fill = "white")) +
-     theme(axis.text = element_text(face = "plain", size = 12))
+wide <- long %>%
+     pivot_wider(names_from = "Source",values_from = "Q")
+mon_pri <- ggplot(wide) +
+     geom_point(aes(x=primary,y=monthly)) +
+     xlim(c(0,300)) +
+     ylim(c(1,300)) +
+     labs(title = (TeX('Monthly Mean Discharge $(m^3/s)$ at G1H020')), 
+          x = "Website Primary",
+          y = "Website Monthly") +
+     theme(panel.background = element_rect(fill = "white", colour = "black")) + 
+     theme(aspect.ratio = 1) +
+     theme(axis.text = element_text(face = "plain", size = 14)) +
+     theme(axis.title = element_text(face = "plain", size = 14))
+gmonpri <- ggplotGrob(mon_pri)
+mon_int <- ggplot(wide) +
+     geom_point(aes(x=internal,y=monthly)) +
+     xlim(c(0,300)) +
+     ylim(c(1,300)) +
+     labs(x = "Internal Server",
+          y = "Website Monthly") +
+     theme(panel.background = element_rect(fill = "white", colour = "black")) + 
+     theme(aspect.ratio = 1) +
+     theme(axis.text = element_text(face = "plain", size = 14)) +
+     theme(axis.title = element_text(face = "plain", size = 14))
+gmonint <- ggplotGrob(mon_int)
+grid::grid.newpage()
+comparison <- grid::grid.draw(cbind(gmonpri,gmonint))
+ggsave("source_comparison.eps", comparison, device = "eps", dpi = 300)
+
+# building comparison data frames.
+y1 <- min(c(min(DWSmonth$year),min(DWSraw$year),min(DWSint$year)))
+y2 <- max(c(max(DWSmonth$year),max(DWSraw$year),max(DWSint$year)))
+
 
 
 
